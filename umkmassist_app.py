@@ -5,7 +5,7 @@ from supabase import create_client
 
 # Supabase
 SUPABASE_URL = "https://xzuypgesmwomkjxbllaa.supabase.co"
-SUPABASE_KEY = "sb_publishable_RXOD1-hh6QH-m-9-MltkKA_XcBMJ2nl"
+SUPABASE_KEY = SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXlwZ2VzbXdvbWtqeGJsbGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwNzAxMzcsImV4cCI6MjExMDY0NjEzN30.XlkkmvXFzN4uXn0-CNn7aCgxoHiO4LU_nkco4LAMxpQ"
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 st.set_page_config(page_title="UMKMAssist AI", page_icon="🤖", layout="wide")
