@@ -1,11 +1,63 @@
 import streamlit as st
-import json
 from datetime import datetime
 import random
 
 st.set_page_config(page_title="UMKMAssist AI", page_icon="🤖", layout="wide")
 
-# Inisialisasi session state
+# Custom CSS - Modern & Bright
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .main {
+        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    }
+    
+    h1 {
+        color: #1e293b;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    
+    .stChatMessage {
+        background: white;
+        border-radius: 16px;
+        padding: 12px 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    
+    .stButton>button {
+        background: #4f46e5;
+        color: white;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .stButton>button:hover {
+        background: #4338ca;
+    }
+    
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    div[data-testid="stForm"] {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Session state
 if "business" not in st.session_state:
     st.session_state.business = {
         "name": "Warung Contoh",
@@ -29,23 +81,19 @@ def get_ai_response(user_msg):
     msg = user_msg.lower()
     biz = st.session_state.business
     
-    # Cek FAQ
     for faq in biz["faqs"]:
         if any(word in msg for word in faq["q"].split()):
             return faq["a"]
     
-    # Cek menu / produk
     if any(word in msg for word in ["menu", "makanan", "minuman", "harga", "produk"]):
-        text = "Ini menu kami:\n"
+        text = "**Menu kami:**\n\n"
         for p in biz["products"]:
-            text += f"• {p['name']} - Rp {p['price']:,}\n"
+            text += f"• **{p['name']}** — Rp {p['price']:,}\n"
         return text
     
-    # Pesan / order
     if any(word in msg for word in ["pesan", "order", "booking", "beli"]):
-        return "Silakan isi form booking di bawah untuk memesan. Tim kami akan segera menghubungi Anda."
+        return "Silakan isi form di bawah untuk memesan. Kami akan segera menghubungi Anda."
     
-    # Default
     responses = [
         "Baik, ada yang bisa saya bantu?",
         "Bisa dijelaskan lebih detail?",
@@ -53,19 +101,19 @@ def get_ai_response(user_msg):
     ]
     return random.choice(responses)
 
-# Sidebar - Pengaturan Bisnis
+# Sidebar
 with st.sidebar:
-    st.header("⚙️ Pengaturan Bisnis")
+    st.markdown("### ⚙️ Pengaturan Bisnis")
     biz = st.session_state.business
     biz["name"] = st.text_input("Nama Usaha", biz["name"])
     
-    st.subheader("Produk")
+    st.markdown("**Produk**")
     product_text = st.text_area(
-        "Daftar Produk (format: Nama - Harga)",
+        "Nama - Harga",
         value="\n".join([f"{p['name']} - {p['price']}" for p in biz["products"]]),
-        height=120
+        height=110,
+        label_visibility="collapsed"
     )
-    # Parse produk
     new_products = []
     for line in product_text.split("\n"):
         if " - " in line:
@@ -77,11 +125,12 @@ with st.sidebar:
     if new_products:
         biz["products"] = new_products
     
-    st.subheader("FAQ")
+    st.markdown("**FAQ**")
     faq_text = st.text_area(
-        "FAQ (format: pertanyaan | jawaban)",
+        "pertanyaan | jawaban",
         value="\n".join([f"{f['q']} | {f['a']}" for f in biz["faqs"]]),
-        height=100
+        height=90,
+        label_visibility="collapsed"
     )
     new_faqs = []
     for line in faq_text.split("\n"):
@@ -91,15 +140,15 @@ with st.sidebar:
     if new_faqs:
         biz["faqs"] = new_faqs
 
-# Main
-st.title(f"🤖 {st.session_state.business['name']}")
-st.caption("Asisten AI 24/7 untuk UMKM — Layani pelanggan, jawab FAQ, ambil pesanan otomatis.")
+# Header
+st.markdown(f"# 🤖 {st.session_state.business['name']}")
+st.markdown("Asisten AI untuk UMKM — jawab pertanyaan & catat pesanan otomatis.")
 
 # Chat
-st.subheader("💬 Chat Simulator")
+st.markdown("### 💬 Chat Simulator")
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
-        st.write(msg["content"])
+        st.markdown(msg["content"])
 
 if prompt := st.chat_input("Ketik pesan pelanggan..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -107,37 +156,32 @@ if prompt := st.chat_input("Ketik pesan pelanggan..."):
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.rerun()
 
-# Booking Form
-st.subheader("📋 Booking / Lead Capture")
-with st.form("booking_form"):
-    col1, col2 = st.columns(2)
-    with col1:
+# Booking
+st.markdown("### 📋 Booking / Lead Capture")
+with st.form("booking_form", clear_on_submit=True):
+    c1, c2 = st.columns(2)
+    with c1:
         nama = st.text_input("Nama Pelanggan")
         jumlah = st.number_input("Jumlah", min_value=1, value=1)
-    with col2:
+    with c2:
         pesanan = st.text_input("Pesanan / Keperluan")
         catatan = st.text_input("Catatan (opsional)")
     
-    submitted = st.form_submit_button("Simpan Pesanan", use_container_width=True)
-    if submitted and nama and pesanan:
+    if st.form_submit_button("Simpan Pesanan", use_container_width=True) and nama and pesanan:
         lead = {
-            "waktu": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "waktu": datetime.now().strftime("%d %b %Y, %H:%M"),
             "nama": nama,
             "pesanan": pesanan,
             "jumlah": jumlah,
             "catatan": catatan
         }
         st.session_state.business["leads"].append(lead)
-        st.success(f"Pesanan dari {nama} berhasil dicatat!")
+        st.success(f"Pesanan dari **{nama}** berhasil dicatat!")
 
-# Tampilkan Leads
+# Leads
 if st.session_state.business["leads"]:
-    st.subheader("📊 Daftar Pesanan")
+    st.markdown("### 📊 Daftar Pesanan")
     for lead in reversed(st.session_state.business["leads"]):
-        st.write(f"**{lead['waktu']}** — {lead['nama']} | {lead['pesanan']} (x{lead['jumlah']})")
+        st.markdown(f"**{lead['waktu']}** — {lead['nama']} • {lead['pesanan']} (x{lead['jumlah']})")
 
-st.divider()
-st.caption("Versi Demo • Data tersimpan selama sesi browser")
-    
-
-            
+st.caption("UMKMAssist AI • Versi Demo")
