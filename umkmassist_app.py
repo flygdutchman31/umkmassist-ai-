@@ -1,145 +1,122 @@
 import streamlit as st
 from datetime import datetime
 import random
-import json
+from supabase import create_client
 
-st.set_page_config(
-    page_title="UMKMAssist AI",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Supabase
+SUPABASE_URL = "https://xzuypgesmwomkjxbllaa.supabase.co"
+SUPABASE_KEY = "sb_publishable_RXOD1-hh6QH-m-9-MltkKA_XcBMJ2nl"
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Modern light theme
+st.set_page_config(page_title="UMKMAssist AI", page_icon="🤖", layout="wide")
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    .stApp { background: #f1f5f9; }
+    .stApp { background: #f8fafc; }
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #0f172a; }
-    h1, h2, h3 { color: #0f172a !important; font-weight: 700; }
-    .stTextInput input, .stTextArea textarea, .stNumberInput input {
-        background: white !important; color: #0f172a !important;
-        border: 1px solid #cbd5e1 !important; border-radius: 10px !important;
-    }
-    .stButton button {
-        background: #2563eb !important; color: white !important;
-        border-radius: 10px !important; font-weight: 600 !important; border: none !important;
-    }
-    div[data-testid="stForm"] {
-        background: white; padding: 1.5rem; border-radius: 16px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
-    }
+    .stButton button { background: #2563eb !important; color: white !important; border-radius: 10px !important; }
+    div[data-testid="stForm"] { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 </style>
 """, unsafe_allow_html=True)
 
-# Multi business via kode
 if "kode" not in st.session_state:
     st.session_state.kode = "demo"
 
-if "data" not in st.session_state:
-    st.session_state.data = {}
-
-def get_biz():
-    kode = st.session_state.kode
-    if kode not in st.session_state.data:
-        st.session_state.data[kode] = {
-            "name": "Usaha Saya",
+def load_biz(kode):
+    res = supabase.table("businesses").select("*").eq("kode", kode).execute()
+    if res.data:
+        return res.data[0]
+    else:
+        new = {
+            "kode": kode,
+            "name": "Usaha Baru",
             "products": [{"name": "Produk 1", "price": 10000}],
             "faqs": [{"q": "jam buka", "a": "08.00 - 21.00"}],
-            "leads": [],
-            "messages": []
+            "leads": []
         }
-    return st.session_state.data[kode]
+        supabase.table("businesses").insert(new).execute()
+        return new
 
-biz = get_biz()
+def save_biz(biz):
+    supabase.table("businesses").update({
+        "name": biz["name"],
+        "products": biz["products"],
+        "faqs": biz["faqs"],
+        "leads": biz["leads"]
+    }).eq("kode", biz["kode"]).execute()
+
+biz = load_biz(st.session_state.kode)
 
 def ai_reply(msg):
     m = msg.lower()
-    for f in biz["faqs"]:
+    for f in biz.get("faqs", []):
         if any(w in m for w in f["q"].split()):
             return f["a"]
-    if any(w in m for w in ["menu", "harga", "produk", "makanan"]):
+    if any(w in m for w in ["menu", "harga", "produk"]):
         txt = "**Menu:**\n\n"
-        for p in biz["products"]:
+        for p in biz.get("products", []):
             txt += f"• {p['name']} — Rp {p['price']:,}\n"
         return txt
-    if any(w in m for w in ["pesan", "order", "beli", "booking"]):
-        return "Silakan isi form booking di bawah untuk memesan."
-    return random.choice(["Ada yang bisa dibantu?", "Bisa dijelaskan lebih detail?", "Siap membantu!"])
+    if any(w in m for w in ["pesan", "order", "beli"]):
+        return "Silakan isi form booking di bawah."
+    return random.choice(["Ada yang bisa dibantu?", "Bisa dijelaskan lebih detail?"])
 
-# Sidebar
 with st.sidebar:
-    st.markdown("### 🏪 UMKMAssist")
+    st.header("UMKMAssist")
     new_kode = st.text_input("Kode Usaha", st.session_state.kode)
     if new_kode != st.session_state.kode:
         st.session_state.kode = new_kode
         st.rerun()
     
-    st.divider()
     biz["name"] = st.text_input("Nama Usaha", biz["name"])
     
-    st.markdown("**Produk**")
-    prod_txt = st.text_area("Nama - Harga", 
-        "\n".join(f"{p['name']} - {p['price']}" for p in biz["products"]), height=100)
+    prod_txt = st.text_area("Produk (Nama - Harga)", 
+        "\n".join(f"{p['name']} - {p['price']}" for p in biz.get("products", [])), height=100)
     prods = []
     for line in prod_txt.splitlines():
         if " - " in line:
             try:
-                n, p = line.split(" - ", 1)
-                prods.append({"name": n.strip(), "price": int(p.strip())})
+                n, pr = line.split(" - ", 1)
+                prods.append({"name": n.strip(), "price": int(pr.strip())})
             except: pass
     if prods: biz["products"] = prods
     
-    st.markdown("**FAQ**")
-    faq_txt = st.text_area("tanya | jawab",
-        "\n".join(f"{f['q']} | {f['a']}" for f in biz["faqs"]), height=80)
-    faqs = []
-    for line in faq_txt.splitlines():
-        if " | " in line:
-            q, a = line.split(" | ", 1)
-            faqs.append({"q": q.strip(), "a": a.strip()})
-    if faqs: biz["faqs"] = faqs
+    if st.button("Simpan Pengaturan"):
+        save_biz(biz)
+        st.success("Tersimpan!")
 
-# Main
 st.title(f"🤖 {biz['name']}")
-st.caption("Asisten AI untuk UMKM • Siap dipakai pelanggan")
+st.caption(f"Kode: {biz['kode']}")
 
-col1, col2 = st.columns([2, 1])
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-with col1:
-    st.subheader("💬 Chat Pelanggan")
-    for m in biz["messages"]:
-        with st.chat_message(m["role"]):
-            st.markdown(m["content"])
-    
-    if prompt := st.chat_input("Tulis pesan..."):
-        biz["messages"].append({"role": "user", "content": prompt})
-        biz["messages"].append({"role": "assistant", "content": ai_reply(prompt)})
-        st.rerun()
+st.subheader("💬 Chat")
+for m in st.session_state.messages:
+    with st.chat_message(m["role"]):
+        st.markdown(m["content"])
 
-with col2:
-    st.subheader("📋 Booking")
-    with st.form("form", clear_on_submit=True):
-        nama = st.text_input("Nama")
-        pesanan = st.text_input("Pesanan")
-        jumlah = st.number_input("Jumlah", 1, value=1)
-        catatan = st.text_input("Catatan")
-        if st.form_submit_button("Simpan", use_container_width=True) and nama and pesanan:
-            biz["leads"].append({
-                "waktu": datetime.now().strftime("%d/%m %H:%M"),
-                "nama": nama, "pesanan": pesanan, "jumlah": jumlah, "catatan": catatan
-            })
-            st.success("Tercatat!")
+if prompt := st.chat_input("Pesan..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    reply = ai_reply(prompt)
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.rerun()
 
-if biz["leads"]:
-    st.subheader("📊 Pesanan Masuk")
+st.subheader("📋 Booking")
+with st.form("book", clear_on_submit=True):
+    nama = st.text_input("Nama")
+    pesanan = st.text_input("Pesanan")
+    jumlah = st.number_input("Jumlah", 1, value=1)
+    if st.form_submit_button("Simpan Pesanan") and nama and pesanan:
+        lead = {"waktu": datetime.now().strftime("%d/%m %H:%M"), "nama": nama, "pesanan": pesanan, "jumlah": jumlah}
+        biz.setdefault("leads", []).append(lead)
+        save_biz(biz)
+        st.success("Pesanan tersimpan!")
+
+if biz.get("leads"):
+    st.subheader("📊 Pesanan")
     for l in reversed(biz["leads"]):
         st.write(f"**{l['waktu']}** — {l['nama']} • {l['pesanan']} (x{l['jumlah']})")
 
-st.divider()
-st.caption("Bagikan link ini ke pelanggan • Ganti Kode Usaha di sidebar untuk usaha berbeda")
-        
-    
-   
-    
-        
+
