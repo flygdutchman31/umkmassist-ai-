@@ -5,139 +5,139 @@ import random
 
 st.set_page_config(page_title="UMKMAssist AI", page_icon="🤖", layout="wide")
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# Inisialisasi session state
 if "business" not in st.session_state:
     st.session_state.business = {
-        "name": "Warung Makan Bu Sari",
-        "type": "Warung Makan",
-        "hours": "08:00 - 21:00",
-        "phone": "0812-3456-7890",
-        "address": "Jl. Merdeka No. 10, Jakarta",
+        "name": "Warung Contoh",
         "products": [
-            {"name": "Nasi Goreng Spesial", "price": "25.000", "desc": "Nasi goreng dengan telur, ayam, dan sayur"},
-            {"name": "Mie Ayam Bakso", "price": "22.000", "desc": "Mie ayam dengan bakso dan pangsit"},
-            {"name": "Es Teh Manis", "price": "8.000", "desc": "Es teh manis segar"}
+            {"name": "Nasi Goreng", "price": 15000},
+            {"name": "Mie Goreng", "price": 12000},
+            {"name": "Es Teh", "price": 5000}
         ],
         "faqs": [
-            {"q": "buka jam berapa", "a": "Kami buka setiap hari pukul 08:00 sampai 21:00."},
-            {"q": "ada delivery", "a": "Ya, kami melayani delivery via Gojek/Grab. Ongkir menyesuaikan jarak."},
-            {"q": "metode pembayaran", "a": "Transfer BCA/Mandiri, QRIS, atau COD."}
-        ]
+            {"q": "jam buka", "a": "Kami buka setiap hari pukul 08.00 - 21.00"},
+            {"q": "alamat", "a": "Jl. Contoh No. 123, Jakarta"},
+            {"q": "ongkir", "a": "Ongkir gratis untuk area sekitar 3 km"}
+        ],
+        "leads": []
     }
-if "leads" not in st.session_state:
-    st.session_state.leads = []
 
-def get_ai_response(user_msg, business):
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+def get_ai_response(user_msg):
     msg = user_msg.lower()
-    for faq in business["faqs"]:
+    biz = st.session_state.business
+    
+    # Cek FAQ
+    for faq in biz["faqs"]:
         if any(word in msg for word in faq["q"].split()):
             return faq["a"]
     
-    if any(k in msg for k in ["menu", "harga", "apa aja", "produk", "jual"]):
-        reply = f"Halo! Berikut menu di {business['name']}:\n\n"
-        for p in business["products"]:
-            reply += f"• {p['name']} - Rp{p['price']}\n  {p['desc']}\n"
-        reply += "\nMau pesan yang mana? Atau ada pertanyaan lain?"
-        return reply
+    # Cek menu / produk
+    if any(word in msg for word in ["menu", "makanan", "minuman", "harga", "produk"]):
+        text = "Ini menu kami:\n"
+        for p in biz["products"]:
+            text += f"• {p['name']} - Rp {p['price']:,}\n"
+        return text
     
-    if any(k in msg for k in ["pesan", "order", "booking", "reservasi", "ambil"]):
-        return "Siap! Silakan isi form booking di sidebar atau ketik detail pesanan (nama, item, jumlah, alamat). Kami akan konfirmasi segera. 😊"
+    # Pesan / order
+    if any(word in msg for word in ["pesan", "order", "booking", "beli"]):
+        return "Silakan isi form booking di bawah untuk memesan. Tim kami akan segera menghubungi Anda."
     
-    if any(k in msg for k in ["alamat", "lokasi", "dimana"]):
-        return f"Alamat kami: {business['address']}. Buka {business['hours']}."
-    
-    if any(k in msg for k in ["kontak", "nomor", "wa", "telepon"]):
-        return f"Nomor WhatsApp kami: {business['phone']}. Bisa chat langsung atau lewat asisten AI ini 24 jam!"
-    
+    # Default
     responses = [
-        f"Terima kasih sudah menghubungi {business['name']}! Ada yang bisa saya bantu?",
-        "Baik, saya catat. Bisa tolong detail lebih lanjut?",
-        "Kami siap membantu 24/7. Mau tanya menu, pesan, atau info lainnya?"
+        "Baik, ada yang bisa saya bantu?",
+        "Bisa dijelaskan lebih detail?",
+        "Saya siap membantu pesanan atau pertanyaan Anda."
     ]
     return random.choice(responses)
 
-# Sidebar - Business Setup
+# Sidebar - Pengaturan Bisnis
 with st.sidebar:
-    st.title("⚙️ Setup Bisnis")
-    st.session_state.business["name"] = st.text_input("Nama Bisnis", st.session_state.business["name"])
-    st.session_state.business["type"] = st.text_input("Jenis Usaha", st.session_state.business["type"])
-    st.session_state.business["hours"] = st.text_input("Jam Operasional", st.session_state.business["hours"])
-    st.session_state.business["phone"] = st.text_input("No. WhatsApp", st.session_state.business["phone"])
-    st.session_state.business["address"] = st.text_area("Alamat", st.session_state.business["address"])
+    st.header("⚙️ Pengaturan Bisnis")
+    biz = st.session_state.business
+    biz["name"] = st.text_input("Nama Usaha", biz["name"])
     
-    st.subheader("Tambah Produk")
-    new_prod = st.text_input("Nama Produk")
-    new_price = st.text_input("Harga")
-    new_desc = st.text_input("Deskripsi")
-    if st.button("Tambah Produk") and new_prod:
-        st.session_state.business["products"].append({"name": new_prod, "price": new_price, "desc": new_desc})
-        st.success("Produk ditambahkan!")
+    st.subheader("Produk")
+    product_text = st.text_area(
+        "Daftar Produk (format: Nama - Harga)",
+        value="\n".join([f"{p['name']} - {p['price']}" for p in biz["products"]]),
+        height=120
+    )
+    # Parse produk
+    new_products = []
+    for line in product_text.split("\n"):
+        if " - " in line:
+            name, price = line.split(" - ", 1)
+            try:
+                new_products.append({"name": name.strip(), "price": int(price.strip())})
+            except:
+                pass
+    if new_products:
+        biz["products"] = new_products
     
-    st.subheader("Tambah FAQ")
-    faq_q = st.text_input("Pertanyaan (keyword)")
-    faq_a = st.text_area("Jawaban")
-    if st.button("Tambah FAQ") and faq_q:
-        st.session_state.business["faqs"].append({"q": faq_q, "a": faq_a})
-        st.success("FAQ ditambahkan!")
+    st.subheader("FAQ")
+    faq_text = st.text_area(
+        "FAQ (format: pertanyaan | jawaban)",
+        value="\n".join([f"{f['q']} | {f['a']}" for f in biz["faqs"]]),
+        height=100
+    )
+    new_faqs = []
+    for line in faq_text.split("\n"):
+        if " | " in line:
+            q, a = line.split(" | ", 1)
+            new_faqs.append({"q": q.strip(), "a": a.strip()})
+    if new_faqs:
+        biz["faqs"] = new_faqs
 
-# Main UI
-st.title("🤖 UMKMAssist AI")
-st.markdown("**Asisten AI 24/7 untuk UMKM** — Layani pelanggan, jawab FAQ, ambil pesanan & booking otomatis. Siap integrasi WhatsApp Business.")
+# Main
+st.title(f"🤖 {st.session_state.business['name']}")
+st.caption("Asisten AI 24/7 untuk UMKM — Layani pelanggan, jawab FAQ, ambil pesanan otomatis.")
 
-col1, col2 = st.columns([2, 1])
+# Chat
+st.subheader("💬 Chat Simulator")
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
 
-with col1:
-    st.subheader("💬 Chat Simulator (seperti di WhatsApp)")
-    for msg in st.session_state.messages:
-        if msg["role"] == "user":
-            st.chat_message("user").write(msg["content"])
-        else:
-            st.chat_message("assistant").write(msg["content"])
-    
-    if prompt := st.chat_input("Ketik pesan pelanggan..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        response = get_ai_response(prompt, st.session_state.business)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()
+if prompt := st.chat_input("Ketik pesan pelanggan..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    response = get_ai_response(prompt)
+    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.rerun()
 
-with col2:
-    st.subheader("📋 Booking / Lead Capture")
-    with st.form("booking"):
+# Booking Form
+st.subheader("📋 Booking / Lead Capture")
+with st.form("booking_form"):
+    col1, col2 = st.columns(2)
+    with col1:
         nama = st.text_input("Nama Pelanggan")
-        item = st.text_input("Pesanan / Keperluan")
-        jumlah = st.number_input("Jumlah", 1, 100, 1)
-        alamat = st.text_area("Alamat / Catatan")
-        submitted = st.form_submit_button("Simpan Pesanan")
-        if submitted and nama:
-            lead = {
-                "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                "nama": nama,
-                "item": item,
-                "jumlah": jumlah,
-                "alamat": alamat
-            }
-            st.session_state.leads.append(lead)
-            st.success("Pesanan tersimpan! Siap di-follow up.")
+        jumlah = st.number_input("Jumlah", min_value=1, value=1)
+    with col2:
+        pesanan = st.text_input("Pesanan / Keperluan")
+        catatan = st.text_input("Catatan (opsional)")
     
-    st.subheader("📊 Leads Hari Ini")
-    if st.session_state.leads:
-        for lead in reversed(st.session_state.leads[-5:]):
-            st.info(f"{lead['time']} - {lead['nama']}: {lead['item']}")
-    else:
-        st.write("Belum ada pesanan.")
+    submitted = st.form_submit_button("Simpan Pesanan", use_container_width=True)
+    if submitted and nama and pesanan:
+        lead = {
+            "waktu": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "nama": nama,
+            "pesanan": pesanan,
+            "jumlah": jumlah,
+            "catatan": catatan
+        }
+        st.session_state.business["leads"].append(lead)
+        st.success(f"Pesanan dari {nama} berhasil dicatat!")
 
-st.markdown("---")
-st.markdown("""
-### 🚀 Cara Release & Monetisasi
-1. **Deploy gratis** di Streamlit Community Cloud (share.streamlit.io) dari GitHub.
-2. Integrasikan dengan **WhatsApp Cloud API** atau Meta Business Agent untuk chat real.
-3. Ganti fungsi `get_ai_response` dengan LLM (Grok / OpenAI / Gemini) untuk jawaban lebih pintar.
-4. Pricing: Free (basic FAQ) → Rp149.000/bulan (full AI + booking + analytics).
-5. Target: 65+ juta UMKM Indonesia. Bahkan 0,01% sudah market besar.
+# Tampilkan Leads
+if st.session_state.business["leads"]:
+    st.subheader("📊 Daftar Pesanan")
+    for lead in reversed(st.session_state.business["leads"]):
+        st.write(f"**{lead['waktu']}** — {lead['nama']} | {lead['pesanan']} (x{lead['jumlah']})")
 
-**Demo siap release besok pagi.** Terima beres!
+st.divider()
+st.caption("Versi Demo • Data tersimpan selama sesi browser")
+    
 
-""")
-
-st.caption("UMKMAssist AI MVP v1.0 | Dibangun dalam 1 sesi | Analisis-Plan-Eksekusi-Test-Deploy")
+            
