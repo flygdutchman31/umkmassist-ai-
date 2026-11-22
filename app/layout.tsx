@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FORM / FUNCTION — Creative Portfolio",
-  description: "An independent creative portfolio for work with a point of view.",
+  title: "FORM / FUNCTION — Portofolio Kreatif",
+  description: "Portofolio kreatif independen untuk karya dengan sudut pandang.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
