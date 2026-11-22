@@ -1,0 +1,203 @@
+.furniture-viewer {
+  --viewer-ink: #292a27;
+  --viewer-muted: #77756e;
+  --viewer-accent: #d8793e;
+  width: 100%;
+  min-width: 0;
+  color: var(--viewer-ink);
+  font-family: inherit;
+}
+
+.furniture-viewer__heading,
+.furniture-viewer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.furniture-viewer__heading {
+  margin-bottom: 0.65rem;
+}
+
+.furniture-viewer__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.furniture-viewer__hint,
+.furniture-viewer__disclaimer {
+  color: var(--viewer-muted);
+  font-size: 0.76rem;
+}
+
+.furniture-viewer__stage {
+  position: relative;
+  min-height: 390px;
+  aspect-ratio: 1.24 / 1;
+  overflow: hidden;
+  border: 1px solid rgb(42 39 34 / 8%);
+  border-radius: 1.15rem;
+  background:
+    radial-gradient(ellipse at 50% 57%, rgb(225 206 176 / 42%), transparent 54%),
+    linear-gradient(145deg, rgb(245 239 228 / 88%), rgb(232 226 215 / 72%));
+  isolation: isolate;
+}
+
+.furniture-viewer__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  touch-action: none;
+  outline: none;
+}
+
+.furniture-viewer__stage canvas:focus-visible {
+  outline: 2px solid var(--viewer-accent);
+  outline-offset: -4px;
+}
+
+.furniture-viewer__model-tag {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.52rem 0.72rem;
+  border: 1px solid rgb(41 42 39 / 9%);
+  border-radius: 999px;
+  background: rgb(250 247 240 / 86%);
+  color: #47453f;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+
+.furniture-viewer__model-tag span {
+  width: 0.43rem;
+  height: 0.43rem;
+  border-radius: 50%;
+  background: var(--viewer-accent);
+  box-shadow: 0 0 0 3px rgb(216 121 62 / 15%);
+}
+
+.furniture-viewer__footer {
+  margin-top: 0.75rem;
+}
+
+.furniture-viewer__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.furniture-viewer__controls button {
+  display: inline-grid;
+  min-width: 2.35rem;
+  min-height: 2.35rem;
+  place-items: center;
+  padding: 0 0.7rem;
+  border: 1px solid rgb(41 42 39 / 14%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--viewer-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.furniture-viewer__controls button:first-child,
+.furniture-viewer__controls button:last-child {
+  padding: 0;
+  font-size: 1.15rem;
+}
+
+.furniture-viewer__controls button:hover {
+  border-color: var(--viewer-ink);
+  background: var(--viewer-ink);
+  color: #fffaf1;
+}
+
+.furniture-viewer__controls button:focus-visible {
+  outline: 2px solid var(--viewer-accent);
+  outline-offset: 3px;
+}
+
+.furniture-viewer__fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.furniture-viewer__fallback strong {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+}
+
+.furniture-viewer__fallback > span:last-child {
+  max-width: 24rem;
+  color: var(--viewer-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.furniture-viewer__fallback-icon {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(216 121 62 / 12%);
+  color: var(--viewer-accent);
+  font-size: 1.55rem;
+}
+
+@media (max-width: 650px) {
+  .furniture-viewer__stage {
+    min-height: 320px;
+    aspect-ratio: 0.95 / 1;
+    border-radius: 0.9rem;
+  }
+
+  .furniture-viewer__heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .furniture-viewer__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 380px) {
+  .furniture-viewer__stage {
+    min-height: 285px;
+  }
+
+  .furniture-viewer__model-tag {
+    top: 0.75rem;
+    left: 0.75rem;
+    font-size: 0.67rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .furniture-viewer__controls button {
+    transition: none;
+  }
+}
