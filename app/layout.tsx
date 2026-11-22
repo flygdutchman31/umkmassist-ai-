@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import GlassShatter from "./GlassShatter";
 
 export const metadata: Metadata = {
-  title: "FORM / FUNCTION — Creative Portfolio",
-  description: "An independent creative portfolio for work with a point of view.",
+  title: "FORM / FUNCTION — Portofolio Kreatif",
+  description: "Portofolio kreatif independen untuk karya dengan sudut pandang.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body>{children}</body>
+      <body>{children}<GlassShatter /></body>
     </html>
   );
 }
