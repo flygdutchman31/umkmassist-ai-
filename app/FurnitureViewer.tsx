@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ArrowIcon from "./ArrowIcon";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import "./furniture-viewer.css";
@@ -251,7 +252,7 @@ export default function FurnitureViewer() {
         <div className="furniture-viewer__model-tag"><span /> Meja kerja industrial</div>
         {webglUnavailable && (
           <div className="furniture-viewer__fallback" role="status">
-            <span className="furniture-viewer__fallback-icon" aria-hidden="true">↗</span>
+            <span className="furniture-viewer__fallback-icon"><ArrowIcon /></span>
             <strong>Meja industrial custom</strong>
             <span>Tampilan 3D tidak tersedia di browser ini. Model inspirasi ini memadukan bilah kayu dan rangka besi hitam.</span>
           </div>
