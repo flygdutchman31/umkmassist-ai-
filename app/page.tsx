@@ -13,12 +13,16 @@ const products = [
   { number: "03", type: "PEMBUATAN", name: "Rangka & konstruksi", description: "Pembuatan rangka besi dan pekerjaan las sesuai permintaan.", image: workshop.src, alt: "Pengerjaan besi di bengkel" },
 ];
 
+function BrandMark() {
+  return <svg className="brand-mark" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M5 5h39l15 15v39H20L5 44V5Z" fill="#202422"/><path d="M15 15h20l10 10v14L35 49H15V15Z" stroke="#F4F2EB" strokeWidth="5" strokeLinejoin="bevel"/><path d="M25 23v17h11l6-6" stroke="#F4F2EB" strokeWidth="4" strokeLinejoin="bevel"/><path d="M48 6v9M43.5 10.5h9M44.8 7.3l6.4 6.4M51.2 7.3l-6.4 6.4" stroke="#ED673B" strokeWidth="2" strokeLinecap="square"/><path d="m43 48 7-7v8h-7Z" fill="#ED673B"/></svg>;
+}
+
 function WhatsAppIcon() { return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 11.6a8.3 8.3 0 0 1-12.4 7.2L3 20l1.2-4.7a8.3 8.3 0 1 1 16-3.7Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="M8.5 7.8c.3-.4.6-.4.9-.4h.4c.1 0 .3.1.4.4l.7 1.6c.1.2 0 .4-.1.5l-.6.8c-.1.1-.1.3 0 .5.4.7 1.5 1.8 2.5 2.3.2.1.4.1.5 0l.8-.9c.1-.2.3-.2.5-.1l1.6.8c.2.1.3.2.3.4 0 .3-.1 1-.5 1.3-.4.4-1.1.6-1.8.5-1.1-.2-2.8-.9-4.3-2.4-1.3-1.4-2.2-2.9-2.3-4.1-.1-.5.2-1 .4-1.2Z" fill="currentColor"/></svg>; }
 
 export default function Home() {
   return <div className="site" id="beranda">
     <div className="announcement"><span>JASA LAS & PEMBUATAN FURNITUR CUSTOM</span><span>BUAT SESUAI KEBUTUHAN ANDA <b>↗</b></span></div>
-    <header className="header"><a href="#beranda" className="brand" aria-label="Deni Jaya Las, beranda"><span className="brand-symbol">D<span>✳</span></span><span className="brand-name">DENI JAYA<span> / </span>LAS<small>LAS & FURNITUR CUSTOM</small></span></a><nav aria-label="Navigasi utama"><a href="#produk">Produk</a><a href="#layanan">Layanan</a><a href="#proses">Cara pesan</a></nav><a href={whatsapp} target="_blank" rel="noopener noreferrer" className="header-contact"><WhatsAppIcon/> <span>Hubungi kami</span> <b>↗</b></a></header>
+    <header className="header"><a href="#beranda" className="brand" aria-label="Deni Jaya Las, beranda"><BrandMark /><span className="brand-name">DENI JAYA<span> / </span>LAS<small>LAS & FURNITUR CUSTOM</small></span></a><nav aria-label="Navigasi utama"><a href="#produk">Produk</a><a href="#layanan">Layanan</a><a href="#proses">Cara pesan</a></nav><a href={whatsapp} target="_blank" rel="noopener noreferrer" className="header-contact"><WhatsAppIcon/> <span>Hubungi kami</span> <b>↗</b></a></header>
     <main>
       <section className="hero"><div className="hero-copy"><div className="eyebrow"><span className="dot"/> DIBUAT SESUAI KEBUTUHAN ANDA</div><h1>DARI BESI,<br/><em>JADI NYATA.</em></h1><p>Punya desain sendiri atau sekadar ide? Mari wujudkan furnitur dan kebutuhan besi yang pas untuk ruang Anda.</p><div className="hero-actions"><a className="button button-orange" href="#pesan">CERITAKAN KEBUTUHAN <span>↗</span></a><a className="hero-secondary" href="#produk">Lihat inspirasi produk <span>↓</span></a></div><div className="hero-note"><span>01 / BENGKEL LAS</span><span>DIRANCANG UNTUK ANDA</span></div></div><div className="hero-image"><img src={workshop.src} alt="Proses pengerjaan besi dengan percikan api di bengkel"/><div className="image-shade"/><span className="image-caption">PROSES YANG TELITI<br/><strong>HASIL YANG BERARTI.</strong></span><span className="image-index">B / 01 — 03</span></div><span className="hero-corner">✳</span></section>
       <div className="service-strip"><span>FURNITUR CUSTOM</span><b>✳</b><span>PEKERJAAN LAS</span><b>✳</b><span>RANGKA BESI</span><b>✳</b><span>DESAIN SESUAI KEBUTUHAN</span></div>
@@ -29,6 +33,6 @@ export default function Home() {
       <RequestForm phone={phone}/>
       <section className="closing"><div><span className="section-label">PUNYA PERTANYAAN?</span><h2>MARI KITA<br/><em>BICARAKAN.</em></h2></div><a href={whatsapp} target="_blank" rel="noopener noreferrer" className="button button-orange"><WhatsAppIcon/> CHAT VIA WHATSAPP <span>↗</span></a></section>
     </main>
-    <footer><a href="#beranda" className="footer-brand">DENI JAYA <span>/</span> LAS<span>.</span></a><p>JASA LAS & FURNITUR CUSTOM</p><a href="#beranda">KEMBALI KE ATAS ↑</a></footer>
+    <footer><a href="#beranda" className="footer-brand" aria-label="Deni Jaya Las, beranda"><BrandMark /><span>DENI JAYA <b>/</b> LAS<span>.</span></span></a><p>JASA LAS & FURNITUR CUSTOM</p><a href="#beranda">KEMBALI KE ATAS ↑</a></footer>
   </div>;
 }
