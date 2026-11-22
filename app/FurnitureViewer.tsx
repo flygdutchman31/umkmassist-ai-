@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ArrowIcon from "./ArrowIcon";
+import { useLanguage } from "./LanguageProvider";
 import * as THREE from "three";
+import { createClothingRack, createSideTable } from "./furniture-models";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import "./furniture-viewer.css";
 
@@ -121,9 +124,46 @@ function createTable() {
 }
 
 export default function FurnitureViewer() {
+  const { language } = useLanguage();
   const stageRef = useRef<HTMLDivElement>(null);
+  const [model, setModel] = useState<"table" | "rack" | "side">("table");
   const controlsRef = useRef<OrbitControls | null>(null);
   const [webglUnavailable, setWebglUnavailable] = useState(false);
+  const copy = language === "id"
+    ? {
+        canvas: "Model 3D meja industrial dengan permukaan kayu dan rangka besi hitam. Seret untuk memutar.",
+        section: "Pratinjau meja industrial",
+        eyebrow: "Inspirasi desain",
+        hint: "Putar model untuk melihat detail",
+        model: "Meja kerja industrial",
+        fallbackTitle: "Meja industrial custom",
+        fallback: "Tampilan 3D tidak tersedia di browser ini. Model inspirasi ini memadukan bilah kayu dan rangka besi hitam.",
+        disclaimer: "Model inspirasi · bukan produk dengan spesifikasi tetap",
+        controls: "Kontrol tampilan model",
+        turnLeft: "Putar model ke kiri",
+        reset: "Atur ulang",
+        turnRight: "Putar model ke kanan",
+      }
+    : {
+        canvas: "3D model of an industrial table with a wooden top and black steel frame. Drag to rotate.",
+        section: "Industrial table preview",
+        eyebrow: "Design inspiration",
+        hint: "Rotate the model to explore the details",
+        model: "Industrial work table",
+        fallbackTitle: "Custom industrial table",
+        fallback: "3D viewing is unavailable in this browser. This inspirational design combines wooden slats with a black steel frame.",
+        disclaimer: "Design inspiration · not a fixed-specification product",
+        controls: "Model viewing controls",
+        turnLeft: "Rotate model left",
+        reset: "Reset view",
+        turnRight: "Rotate model right",
+      };
+
+  const modelNames = language === "id" ? { table: "Meja industrial", rack: "Rak pakaian", side: "Meja samping" } : { table: "Industrial table", rack: "Clothing rack", side: "Side table" };
+  const canvasLabel = language === "id" ? `Model 3D ${modelNames[model]}. Seret untuk memutar.` : `3D model of ${modelNames[model]}. Drag to rotate.`;
+  useEffect(() => {
+    stageRef.current?.querySelector("canvas")?.setAttribute("aria-label", canvasLabel);
+  }, [canvasLabel, model]);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -151,7 +191,6 @@ export default function FurnitureViewer() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.domElement.setAttribute("role", "img");
-    renderer.domElement.setAttribute("aria-label", "Model 3D meja industrial dengan permukaan kayu dan rangka besi hitam. Seret untuk memutar.");
     renderer.domElement.tabIndex = 0;
     stage.appendChild(renderer.domElement);
 
@@ -179,7 +218,7 @@ export default function FurnitureViewer() {
     ground.position.y = 0.001;
     ground.receiveShadow = true;
     scene.add(ground);
-    scene.add(createTable());
+    scene.add(model === "rack" ? createClothingRack() : model === "side" ? createSideTable() : createTable());
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0.78, 0);
@@ -229,7 +268,7 @@ export default function FurnitureViewer() {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, []);
+  }, [model]);
 
   const rotate = (direction: number) => {
     const controls = controlsRef.current;
@@ -242,27 +281,30 @@ export default function FurnitureViewer() {
   };
 
   return (
-    <section className="furniture-viewer" aria-label="Pratinjau meja industrial">
+    <section className="furniture-viewer" aria-label={copy.section}>
       <div className="furniture-viewer__heading">
-        <span className="furniture-viewer__eyebrow">Inspirasi desain</span>
-        <span className="furniture-viewer__hint">Putar model untuk melihat detail</span>
+        <span className="furniture-viewer__eyebrow">{copy.eyebrow}</span>
+        <span className="furniture-viewer__hint">{copy.hint}</span>
+      </div>
+      <div className="furniture-viewer__choices" role="group" aria-label={language === "id" ? "Pilih model" : "Choose model"}>
+        {(["table", "rack", "side"] as const).map((key) => <button type="button" key={key} aria-pressed={model === key} onClick={() => setModel(key)}>{modelNames[key]}</button>)}
       </div>
       <div className="furniture-viewer__stage" ref={stageRef}>
-        <div className="furniture-viewer__model-tag"><span /> Meja kerja industrial</div>
+        <div className="furniture-viewer__model-tag"><span /> {modelNames[model]}</div>
         {webglUnavailable && (
           <div className="furniture-viewer__fallback" role="status">
-            <span className="furniture-viewer__fallback-icon" aria-hidden="true">↗</span>
-            <strong>Meja industrial custom</strong>
-            <span>Tampilan 3D tidak tersedia di browser ini. Model inspirasi ini memadukan bilah kayu dan rangka besi hitam.</span>
+            <span className="furniture-viewer__fallback-icon"><ArrowIcon /></span>
+            <strong>{modelNames[model]}</strong>
+            <span>{language === "id" ? "Tampilan 3D tidak tersedia di browser ini." : "3D viewing is unavailable in this browser."}</span>
           </div>
         )}
       </div>
       <div className="furniture-viewer__footer">
-        <span className="furniture-viewer__disclaimer">Model inspirasi · bukan produk dengan spesifikasi tetap</span>
-        <div className="furniture-viewer__controls" aria-label="Kontrol tampilan model">
-          <button type="button" onClick={() => rotate(-1)} aria-label="Putar model ke kiri" disabled={webglUnavailable}>↶</button>
-          <button type="button" onClick={() => controlsRef.current?.reset()} aria-label="Atur ulang tampilan" disabled={webglUnavailable}>Atur ulang</button>
-          <button type="button" onClick={() => rotate(1)} aria-label="Putar model ke kanan" disabled={webglUnavailable}>↷</button>
+        <span className="furniture-viewer__disclaimer">{copy.disclaimer}</span>
+        <div className="furniture-viewer__controls" aria-label={copy.controls}>
+          <button type="button" onClick={() => rotate(-1)} aria-label={copy.turnLeft} disabled={webglUnavailable}>↶</button>
+          <button type="button" onClick={() => controlsRef.current?.reset()} aria-label={copy.reset} disabled={webglUnavailable}>{copy.reset}</button>
+          <button type="button" onClick={() => rotate(1)} aria-label={copy.turnRight} disabled={webglUnavailable}>↷</button>
         </div>
       </div>
     </section>
