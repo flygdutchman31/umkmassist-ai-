@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "run": "python3 umkmassist_app.py"
+  }
+}

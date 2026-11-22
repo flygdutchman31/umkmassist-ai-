@@ -1,2 +1,1 @@
-streamlit>=1.40.0
-supabase>=2.0.0
+# The portfolio runs on the Python standard library; no packages are required.
