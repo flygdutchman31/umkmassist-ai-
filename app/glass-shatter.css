@@ -1,0 +1,57 @@
+.glass-shatter-layer {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.glass-shatter-burst {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.glass-shard {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--shard-size);
+  height: calc(var(--shard-size) + 7px);
+  background: var(--shard-color);
+  clip-path: var(--shard-shape);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.12) rotate(0deg);
+  filter: drop-shadow(0 0 5px rgb(212 245 250 / 75%));
+  animation: glass-shard-flight var(--shard-duration) cubic-bezier(0.16, 0.72, 0.28, 1) var(--shard-delay) both;
+  will-change: transform, opacity;
+}
+
+@keyframes glass-shard-flight {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.12) rotate(0deg);
+  }
+
+  14% {
+    opacity: 0.94;
+    transform: translate(-50%, -50%) scale(1) rotate(12deg);
+  }
+
+  62% {
+    opacity: 0.78;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--shard-x)), calc(-50% + var(--shard-y))) scale(0.68) rotate(var(--shard-rotation));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-shatter-layer {
+    display: none;
+  }
+}
