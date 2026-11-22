@@ -1,3 +1,7 @@
+import architecture from "../public/assets/architecture.jpg";
+import interior from "../public/assets/interior.jpg";
+import structure from "../public/assets/structure.jpg";
+
 export default function Home() {
   return (
     <>
@@ -24,7 +28,7 @@ export default function Home() {
           </div>
         </div>
         <div className="hero-visual">
-          <img src="/assets/architecture.jpg" alt="Sculptural white architecture against a clear sky"/>
+          <img src={architecture.src} alt="Sculptural white architecture against a clear sky"/>
           <div className="image-topline"><span>FORM FOLLOWS FEELING</span><span>001 / 026</span></div>
           <div className="image-caption"><span>DESIGN WITH<br />DIMENSION.</span><span>↗</span></div>
           <span className="image-side">A LITTLE LESS EXPECTED — A LOT MORE INTENTIONAL</span>
@@ -39,11 +43,11 @@ export default function Home() {
         <div className="section-heading"><div><span className="section-kicker">01 / THE GOOD STUFF</span><h2>SELECTED<br /><span>WORK</span><sup>®</sup></h2></div><p>A small collection of ideas<br />made with intention.<br /><span>CONCEPT PROJECTS / 2026</span></p></div>
         <div className="project-grid">
           <article className="project">
-            <div className="project-image project-image-one"><img src="/assets/interior.jpg" alt="A bright, modern interior with warm wooden details"/><span className="project-tag">01 / SPACE</span><span className="project-arrow">↗</span></div>
+            <div className="project-image project-image-one"><img src={interior.src} alt="A bright, modern interior with warm wooden details"/><span className="project-tag">01 / SPACE</span><span className="project-arrow">↗</span></div>
             <div className="project-info"><div><h3>THE COMMON ROOM</h3><p>Making space for better ideas.</p></div><span>IDENTITY / DIGITAL</span></div>
           </article>
           <article className="project">
-            <div className="project-image project-image-two"><img src="/assets/structure.jpg" alt="Architectural concrete structure seen from below"/><span className="project-tag">02 / FORM</span><span className="project-arrow">↗</span></div>
+            <div className="project-image project-image-two"><img src={structure.src} alt="Architectural concrete structure seen from below"/><span className="project-tag">02 / FORM</span><span className="project-arrow">↗</span></div>
             <div className="project-info"><div><h3>OBJECTS OF NOTE</h3><p>A different perspective on the everyday.</p></div><span>ART DIRECTION / EDITORIAL</span></div>
           </article>
         </div>
