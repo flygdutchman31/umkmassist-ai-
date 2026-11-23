@@ -173,3 +173,33 @@ export function createSideTable() {
   group.add(topMount);
   return group;
 }
+
+export function createCanopy(): THREE.Group {
+  const canopy = new THREE.Group();
+  const frame = new THREE.MeshStandardMaterial({ color: "#252b2b", metalness: 0.72, roughness: 0.38 });
+  const roofMaterial = new THREE.MeshStandardMaterial({ color: "#7c8583", metalness: 0.42, roughness: 0.6, side: THREE.DoubleSide });
+  const fastener = new THREE.MeshStandardMaterial({ color: "#a0a7a4", metalness: 0.8, roughness: 0.3 });
+  const slope = 0.08;
+  const roof = new THREE.Group();
+  roof.position.y = 2.05;
+  roof.rotation.x = slope;
+  canopy.add(roof);
+
+  for (const x of [-1.25, 1.25]) {
+    for (const z of [-0.78, 0.78]) {
+      const height = 2.05 - Math.sin(slope) * z;
+      box(canopy, [0.09, height, 0.09], [x, height / 2, z], frame);
+      box(canopy, [0.18, 0.03, 0.18], [x, 0.015, z], frame);
+    }
+  }
+  for (const z of [-0.9, 0, 0.9]) box(roof, [2.75, 0.085, 0.085], [0, -0.05, z], frame);
+  for (const x of [-1.3, -0.65, 0, 0.65, 1.3]) box(roof, [0.07, 0.07, 1.9], [x, -0.06, 0], frame);
+  box(roof, [2.8, 0.045, 1.92], [0, 0.035, 0], roofMaterial);
+  for (let i = -6; i <= 6; i++) box(roof, [0.025, 0.025, 1.92], [i * 0.21, 0.07, 0], roofMaterial);
+  for (const x of [-1.22, 1.22]) for (const z of [-0.78, 0.78]) {
+    const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.018, 12), fastener);
+    bolt.position.set(x, 0.04, z);
+    canopy.add(bolt);
+  }
+  return canopy;
+}
