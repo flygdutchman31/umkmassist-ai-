@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ArrowIcon from "./ArrowIcon";
 import { useLanguage } from "./LanguageProvider";
 import * as THREE from "three";
-import { createClothingRack, createSideTable } from "./furniture-models";
+import { createCanopy, createClothingRack, createSideTable } from "./furniture-models";
 import { createWardrobe } from "./wardrobe-model";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import "./furniture-viewer.css";
@@ -127,7 +127,7 @@ function createTable() {
 export default function FurnitureViewer() {
   const { language } = useLanguage();
   const stageRef = useRef<HTMLDivElement>(null);
-  const [model, setModel] = useState<"table" | "rack" | "side" | "wardrobe">("table");
+  const [model, setModel] = useState<"table" | "rack" | "side" | "wardrobe" | "canopy">("table");
   const controlsRef = useRef<OrbitControls | null>(null);
   const [webglUnavailable, setWebglUnavailable] = useState(false);
   const copy = language === "id"
@@ -160,7 +160,7 @@ export default function FurnitureViewer() {
         turnRight: "Rotate model right",
       };
 
-  const modelNames = language === "id" ? { table: "Meja industrial", rack: "Rak pakaian", side: "Meja samping", wardrobe: "Lemari kaca" } : { table: "Industrial table", rack: "Clothing rack", side: "Side table", wardrobe: "Glass wardrobe" };
+  const modelNames = language === "id" ? { table: "Meja industrial", rack: "Rak pakaian", side: "Meja samping", wardrobe: "Lemari kaca", canopy: "Kanopi besi" } : { table: "Industrial table", rack: "Clothing rack", side: "Side table", wardrobe: "Glass wardrobe", canopy: "Steel canopy" };
   const canvasLabel = language === "id" ? `Model 3D ${modelNames[model]}. Seret untuk memutar.` : `3D model of ${modelNames[model]}. Drag to rotate.`;
   useEffect(() => {
     const stage = stageRef.current;
@@ -177,10 +177,10 @@ export default function FurnitureViewer() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 40);
-    const cameraScale = model === "side" ? 0.68 : model === "rack" ? 0.78 : model === "wardrobe" ? 1.15 : 1;
+    const cameraScale = model === "side" ? 0.68 : model === "rack" ? 0.78 : model === "wardrobe" ? 1.15 : model === "canopy" ? 1.25 : 1;
     if (model === "wardrobe") camera.position.set(2.7, 2.05, 5.3);
     else camera.position.set(3.85 * cameraScale, 3.05 * cameraScale, 4.55 * cameraScale);
-    camera.lookAt(0, model === "wardrobe" ? 1 : 0.78, 0);
+    camera.lookAt(0, model === "wardrobe" || model === "canopy" ? 1 : 0.78, 0);
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.setSize(stage.clientWidth, stage.clientHeight, false);
@@ -217,10 +217,10 @@ export default function FurnitureViewer() {
     ground.position.y = 0.001;
     ground.receiveShadow = true;
     scene.add(ground);
-    scene.add(model === "rack" ? createClothingRack() : model === "side" ? createSideTable() : model === "wardrobe" ? createWardrobe() : createTable());
+    scene.add(model === "rack" ? createClothingRack() : model === "side" ? createSideTable() : model === "wardrobe" ? createWardrobe() : model === "canopy" ? createCanopy() : createTable());
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, model === "wardrobe" ? 1 : 0.78, 0);
+    controls.target.set(0, model === "wardrobe" || model === "canopy" ? 1 : 0.78, 0);
     controls.enableDamping = !reducedMotion;
     controls.dampingFactor = 0.075;
     controls.enablePan = false;
@@ -290,7 +290,7 @@ export default function FurnitureViewer() {
         <span className="furniture-viewer__hint">{copy.hint}</span>
       </div>
       <div className="furniture-viewer__choices" role="group" aria-label={language === "id" ? "Pilih model" : "Choose model"}>
-        {(["table", "rack", "side", "wardrobe"] as const).map((key) => <button type="button" key={key} aria-pressed={model === key} onClick={() => setModel(key)}>{modelNames[key]}</button>)}
+        {(["table", "rack", "side", "wardrobe", "canopy"] as const).map((key) => <button type="button" key={key} aria-pressed={model === key} onClick={() => setModel(key)}>{modelNames[key]}</button>)}
       </div>
       <div className="furniture-viewer__stage" ref={stageRef}>
         <div className="furniture-viewer__model-tag"><span /> {modelNames[model]}</div>
